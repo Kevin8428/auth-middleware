@@ -14,7 +14,8 @@ docker exec -it $(docker ps -a -q  --filter ancestor=$REPO:$VERSION) /bin/bash
 
 # flask run
 # curl -d 'client_id=1&client_secret=something&is_admin=false' http://127.0.0.1:5000/client
-
+# curl -d 'client_id=1&client_secret=something&is_admin=false' http://127.0.0.1:5000/auth
+# curl -X POST http://127.0.0.1:5000/verify -H "Authorization: Bearer eyJ0eX..."
 
 # psql -d "postgresql://postgres:password@localhost/authdb_dev"
 # psql -d "postgresql://postgres:password@localhost/authdb_dev" -c "select now()"
