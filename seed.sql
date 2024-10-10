@@ -1,8 +1,9 @@
-
+-- DDL
 DROP DATABASE IF EXISTS authdb_dev;
+DROP DATABASE IF EXISTS public.clients;
+DROP DATABASE IF EXISTS public.blocked;
 
 ALTER USER postgres WITH PASSWORD 'password';
--- DDL
 CREATE DATABASE authdb_dev
     WITH 
     OWNER = postgres
@@ -20,9 +21,9 @@ CREATE TABLE public.clients
     "IsAdmin" boolean NOT NULL,
     CONSTRAINT clients_pkey PRIMARY KEY ("Id"),
     CONSTRAINT "ClientId" UNIQUE ("ClientId")
-)
+);
 
--- CREATE TABLE public.blacklist
--- (
---     token character varying(256) COLLATE pg_catalog."default" NOT NULL
--- )
+CREATE TABLE public.blocked
+(
+    token character varying(256) COLLATE pg_catalog."default" NOT NULL
+);

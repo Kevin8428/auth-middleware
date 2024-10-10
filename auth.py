@@ -11,11 +11,19 @@ app = Flask(__name__)
 # return status code
 # reorge file hierarcy
 
+# routes to add
+# /logout - add token to `blocked` table
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    token = request.form.get("token")
+    status = storage.block(token)
+    return {'success': status}
+
 @app.route("/verify", methods=["POST"])
 def verify():
     """
-    Verify token
-    do this by decoding token with AUTHSECRET -  jwt.Decode(token, AUTHSECRET)
+    Verify JWT - decoode token with AUTHSECRET
     """
     token = request.headers.get('authorization').replace('Bearer ', '')
     verified = storage.verify(token)
@@ -26,29 +34,8 @@ def verify():
 @app.route("/auth", methods=["POST"])
 def auth():
     """
-    POST - authenticate client - give them a token
-    get id
-    get secret
-    get record from db with encrypted secret as id
-    # - record found? ok create JWT. No? fail auth
-    # - JWT is signed with server-owned secret. This way, can't be altered by anyone.
-    # - this is why JWT is secure/trusted.
-    # encode response using secret, user_id, user_secret
-    encoded_jwt = jwt.encode(
-        payload = {
-            id = 1,
-            clientId = 2,
-            isAdmin = True,
-            expiration = 2025
-        },
-        key='my_secret',
-        algorithm='HS256'
-    )
-    # return
-    {
-        token: "fdasfsdfdafsafdadfsa",
-        expiresin: 1000
-    }
+    Provide JWT
+    Verify user exists in storage, generate JWT
     """
     cid = request.form.get('client_id')
     secret = request.form.get('client_secret')
@@ -65,15 +52,8 @@ def auth():
 @app.route("/client", methods=["POST"])
 def client():
     """
-    POST - create client record
-    get `authorization` header (token)
-    get is_admin
-    get client_id
-    get client_secret.hexdigest()
-    hash secret with sha256
-    write to `clients` table - client_id, client_secret, is_admin
+    Save user creds in DB
     """
-
     # can use `token` for invalidating token - eg put in a `denied` table
     # token = request.headers.get('authorization').replace('Bearer', '')
     cid = request.form.get('client_id')
