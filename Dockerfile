@@ -18,5 +18,5 @@ ENV AUTHSECRET=secret
 ENV FLASK_APP=auth.py
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
-WORKDIR /app
-COPY . /app
+WORKDIR /home
+COPY . /home

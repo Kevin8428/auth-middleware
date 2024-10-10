@@ -15,6 +15,8 @@ DBNAME = os.getenv('DBNAME')
 DBUSER = os.getenv('DBUSER')
 DBPASSWORD = os.getenv('DBPASSWORD')
 AUTHSECRET = os.getenv('AUTHSECRET')
+TABLE_BLOCKED = os.getenv('TABLE_BLOCKED', 'blocked')
+TABLE_CLIENTS = os.getenv('TABLE_CLIENTS', 'clients')
 HOST = os.getenv('HOST')
 HASH = os.getenv('HASH', 'HS256')
 EXPIRE_SECONDS = 3600
@@ -24,7 +26,7 @@ def block(token):
     Store unauthorized token
     """
     conn = None
-    query = f"insert into blocked (token) values('{token}')"
+    query = f"insert into {TABLE_BLOCKED} (token) values('{token}')"
     try:
         c = 'dbname=' + DBNAME + ' user=' + DBUSER + ' password=' + DBPASSWORD + ' host=' + HOST
         logger.info('connect config: %s', c)

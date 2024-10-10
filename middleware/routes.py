@@ -1,15 +1,29 @@
-import hashlib
+from flask import request, abort
 
-from middleware import models
-def client(request):
+from functools import wraps
+import models
+
+def validate_request(f):
+    """docs"""
+    wraps(f)
+    def decorated_function(*args, **kwargs):
+        verified = verify(request)
+        print('verified: ', verified)
+        if not verified:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
+def verify(request):
     """
-    Save user creds in DB
+    Verify JWT - decoode token with AUTHSECRET
     """
-    # can use `token` for invalidating token - eg put in a `denied` table
-    # token = request.headers.get('authorization').replace('Bearer', '')
-    cid = request.form.get('client_id')
-    secret = request.form.get('client_secret')
-    is_admin = request.form.get('is_admin', False)
-    secret_sha = hashlib.sha256(bytes(secret, 'utf-8')).hexdigest() # encrypt pw at rest
-    response = models.create(cid, secret_sha, is_admin)
-    return {'success': response}
+    print('request: ', request)
+    token = request.headers.get('authorization').replace('Bearer ', '')
+    print('token: ', token)
+    verified = models.verify(token)
+    print('verified: ', verified)
+    
+    return verified

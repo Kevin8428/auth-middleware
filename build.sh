@@ -4,8 +4,14 @@ VERSION=$1
 VERSION=${VERSION:-0.0.1}
 docker build -t $REPO:$VERSION .
 
-docker run --rm -itd $REPO:$VERSION /bin/bash -c "sleep infinity"
+# docker run --rm -itd -v /Users/cargometrics/personal/middleware_auth/middleware:/app/middleware middleware:0.0.1 /bin/bash -c "sleep infinity"
+# docker run --rm -itd middleware:0.0.1 /bin/bash -c "sleep infinity"
+
+docker run --rm -itd -v ${PWD}:/home $REPO:$VERSION /bin/bash -c "sleep infinity"
 docker exec -it $(docker ps -a -q  --filter ancestor=$REPO:$VERSION) /bin/bash
+
+
+
 
 # pg_lsclusters
 # pg_ctlcluster 10 main start && sudo -u postgres psql
@@ -19,3 +25,7 @@ docker exec -it $(docker ps -a -q  --filter ancestor=$REPO:$VERSION) /bin/bash
 
 # psql -d "postgresql://postgres:password@localhost/authdb_dev"
 # psql -d "postgresql://postgres:password@localhost/authdb_dev" -c "select now()"
+
+
+
+# curl -d 'client_id=1&client_secret=something&is_admin=false' http://127.0.0.1:5000/users
