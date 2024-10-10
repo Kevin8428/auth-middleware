@@ -1,8 +1,5 @@
 import os
-import json
 import logging
-import jwt
-from datetime import datetime, timedelta, timezone
 
 
 import psycopg2
@@ -15,18 +12,23 @@ DBNAME = os.getenv('DBNAME')
 DBUSER = os.getenv('DBUSER')
 DBPASSWORD = os.getenv('DBPASSWORD')
 AUTHSECRET = os.getenv('AUTHSECRET')
-TABLE_BLOCKED = os.getenv('TABLE_BLOCKED', 'blocked')
-TABLE_CLIENTS = os.getenv('TABLE_CLIENTS', 'clients')
 HOST = os.getenv('HOST')
 HASH = os.getenv('HASH', 'HS256')
-EXPIRE_SECONDS = 3600
+
+
+class Client():
+    def __init__(self, id, client_id, is_admin):
+        self.id = id
+        self.client_id = client_id
+        self.is_admin = is_admin
+
 
 def block(token):
     """
     Store unauthorized token
     """
     conn = None
-    query = f"insert into {TABLE_BLOCKED} (token) values('{token}')"
+    query = f"insert into blocked (token) values('{token}')"
     try:
         c = 'dbname=' + DBNAME + ' user=' + DBUSER + ' password=' + DBPASSWORD + ' host=' + HOST
         logger.info('connect config: %s', c)
@@ -72,21 +74,6 @@ def is_blocked(token):
             conn.close()
 
 
-def verify(token):
-    """
-    Attempt to decode token
-    """
-    try:
-        blocked = is_blocked(token)
-        logger.info('blocked: %s', blocked)
-        if blocked:
-             return False
-        decoded = jwt.decode(token, AUTHSECRET, algorithms=[HASH])
-        return decoded
-    except (Exception) as e:
-        logger.error('verification failed: %s', e)
-        return False
-
 def authenticate(cid, secret):
     """
     Find row matching cid, secret
@@ -108,19 +95,8 @@ def authenticate(cid, secret):
         row_id = row[0]
         row_cid = row[1]
         admin = row[2]
-        payload = {
-            'id': row_id,
-            'sub': row_cid,
-            'isAdmin': admin,
-            'exp': datetime.now(timezone.utc) + timedelta(seconds=EXPIRE_SECONDS)
-        }
-        token = jwt.encode(payload, AUTHSECRET, algorithm=HASH)
-        # return class with is_auth method
-        return {
-            # 'token': token.decode('utf-8'),
-            'token': token,
-            'expiresin': EXPIRE_SECONDS
-        }
+        client = Client(row_id, row_cid, admin)
+        return client
     except (Exception, psycopg2.DatabaseError) as e:
         logger.error('failed reading from postgres: %s', e)
         # return class with is_auth method

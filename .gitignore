@@ -1,5 +1,6 @@
 .env
 notes.md
+notes.py
 test.py
 .ssh
 __pycache__
