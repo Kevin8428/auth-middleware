@@ -58,6 +58,7 @@ def is_blocked(token):
         cur = conn.cursor()
         cur.execute(query)
         record_count = cur.fetchone()[0]
+        print('record_count: ', record_count)
         if record_count == 1:
             return True
         return False

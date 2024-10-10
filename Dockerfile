@@ -15,7 +15,7 @@ ENV HOST=localhost
 ENV DBUSER=postgres
 ENV DBPASSWORD=password
 ENV AUTHSECRET=secret
-ENV FLASK_APP=auth.py
+ENV FLASK_APP=service.py
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 WORKDIR /home
